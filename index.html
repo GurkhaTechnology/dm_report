@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Campaign Dashboard</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Social Media Campaign Dashboard</h1>
+        <table id="campaignTable">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRPGzw3oJYU6jpFOZkWinqUETFocvRqWHEEna-2MK_XpYYy57GzMdm2JPs-bt6mQoWCOZqprRZhX7_/pub?output=csv';
+
+        // Use PapaParse to fetch and parse the CSV data
+        Papa.parse(csvUrl, {
+            download: true,
+            header: false, // Set to true if you want to use the first row as header
+            complete: function(results) {
+                // Debugging: Log the results to check the data structure
+                console.log(results);
+
+                const tableBody = document.getElementById('campaignTable').getElementsByTagName('tbody')[0];
+
+                results.data.forEach((row, index) => {
+                    if (index > 0 && row.length >= 2) { // Skip header row and check row length
+                        const newRow = tableBody.insertRow();
+                        const cellItem = newRow.insertCell(0);
+                        const cellValue = newRow.insertCell(1);
+                        cellItem.textContent = row[0].trim(); // Item
+                        cellValue.textContent = row[1].trim(); // Value
+                    }
+                });
+            },
+            error: function(error) {
+                console.error('Error fetching or parsing the CSV data:', error);
+            }
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</body>
+</html>
