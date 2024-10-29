@@ -15,7 +15,19 @@
 <body>
     <div class="container my-5">
         <h1 class="text-center mb-5">Social Media Campaign Dashboard</h1>
-        
+
+        <!-- Count-up animations for Engagement Rate and Follower Growth -->
+        <div class="row text-center mb-4">
+            <div class="col">
+                <h5>Engagement Rate</h5>
+                <h2 id="engagementRate" class="display-4">0</h2>
+            </div>
+            <div class="col">
+                <h5>Follower Growth</h5>
+                <h2 id="followerGrowth" class="display-4">0</h2>
+            </div>
+        </div>
+
         <!-- Table for displaying CSV data -->
         <div class="table-responsive">
             <table class="table table-bordered" id="campaignTable">
@@ -41,21 +53,19 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTRPGzw3oJYU6jpFOZkWinqUETFocvRqWHEEna-2MK_XpYYy57GzMdm2JPs-bt6mQoWCOZqprRZhX7_/pub?output=csv';
 
-        // Use PapaParse to fetch and parse the CSV data
         Papa.parse(csvUrl, {
             download: true,
             header: false,
             complete: function(results) {
-                console.log(results); // Debugging: Log the parsed results
-
                 const tableBody = document.getElementById('campaignTable').getElementsByTagName('tbody')[0];
                 const metrics = {};
+                let engagementRate = 0;
+                let followerGrowth = 0;
 
-                // Populate the table with CSV data and collect metrics for the chart
                 results.data.forEach((row, index) => {
                     if (index > 0 && row.length >= 2) { // Skip the header row
                         const item = row[0].trim();
-                        const value = parseFloat(row[1]) || row[1].trim(); // Convert numbers or keep as strings
+                        const value = parseFloat(row[1]) || row[1].trim();
 
                         // Insert rows into the table
                         const newRow = tableBody.insertRow();
@@ -64,14 +74,22 @@
                         cellItem.textContent = item;
                         cellValue.textContent = value;
 
-                        // Collect metrics for the chart
-                        if (['Total Reached', 'engagement rate', 'reach', 'impressions', 'follower growth'].includes(item)) {
+                        // Collect metrics for the chart, and separate values for count-up
+                        if (item === 'engagement rate') {
+                            engagementRate = value;
+                        } else if (item === 'follower growth') {
+                            followerGrowth = value;
+                        } else if (['Total Reached', 'reach', 'impressions'].includes(item)) {
                             metrics[item] = value;
                         }
                     }
                 });
 
-                // Draw the chart with the collected metrics
+                // Run the count-up animations
+                countUpAnimation('engagementRate', engagementRate);
+                countUpAnimation('followerGrowth', followerGrowth);
+
+                // Draw the chart with the remaining metrics
                 drawChart(metrics);
             },
             error: function(error) {
@@ -105,6 +123,24 @@
                     }
                 }
             });
+        }
+
+        // Function to animate count-up effect
+        function countUpAnimation(elementId, targetValue) {
+            let current = 0;
+            const increment = targetValue / 100; // 100 steps for a smoother animation
+            const element = document.getElementById(elementId);
+
+            function updateValue() {
+                current += increment;
+                if (current >= targetValue) {
+                    element.textContent = targetValue;
+                } else {
+                    element.textContent = Math.ceil(current);
+                    requestAnimationFrame(updateValue);
+                }
+            }
+            updateValue();
         }
     </script>
 
