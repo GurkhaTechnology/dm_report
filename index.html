@@ -4,23 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Social Media Campaign Dashboard</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- PapaParse for CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Social Media Campaign Dashboard</h1>
-        <table id="campaignTable">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Data will be populated here -->
-            </tbody>
-        </table>
+    <div class="container my-5">
+        <h1 class="text-center mb-5">Social Media Campaign Dashboard</h1>
+        
+        <!-- Table for displaying CSV data -->
+        <div class="table-responsive">
+            <table class="table table-bordered" id="campaignTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Item</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Chart section for visualizing selected data -->
+        <div class="my-5">
+            <h3 class="text-center">Campaign Performance Metrics</h3>
+            <canvas id="metricsChart" width="400" height="200"></canvas>
+        </div>
     </div>
 
     <script>
@@ -29,75 +44,73 @@
         // Use PapaParse to fetch and parse the CSV data
         Papa.parse(csvUrl, {
             download: true,
-            header: false, // Set to true if you want to use the first row as header
+            header: false,
             complete: function(results) {
-                // Debugging: Log the results to check the data structure
-                console.log(results);
+                console.log(results); // Debugging: Log the parsed results
 
                 const tableBody = document.getElementById('campaignTable').getElementsByTagName('tbody')[0];
+                const metrics = {};
 
+                // Populate the table with CSV data and collect metrics for the chart
                 results.data.forEach((row, index) => {
-                    if (index > 0 && row.length >= 2) { // Skip header row and check row length
+                    if (index > 0 && row.length >= 2) { // Skip the header row
+                        const item = row[0].trim();
+                        const value = parseFloat(row[1]) || row[1].trim(); // Convert numbers or keep as strings
+
+                        // Insert rows into the table
                         const newRow = tableBody.insertRow();
                         const cellItem = newRow.insertCell(0);
                         const cellValue = newRow.insertCell(1);
-                        cellItem.textContent = row[0].trim(); // Item
-                        cellValue.textContent = row[1].trim(); // Value
+                        cellItem.textContent = item;
+                        cellValue.textContent = value;
+
+                        // Collect metrics for the chart
+                        if (['Total Reached', 'engagement rate', 'reach', 'impressions', 'follower growth'].includes(item)) {
+                            metrics[item] = value;
+                        }
                     }
                 });
+
+                // Draw the chart with the collected metrics
+                drawChart(metrics);
             },
             error: function(error) {
                 console.error('Error fetching or parsing the CSV data:', error);
             }
         });
+
+        // Function to create a chart with Chart.js
+        function drawChart(metrics) {
+            const ctx = document.getElementById('metricsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(metrics),
+                    datasets: [{
+                        label: 'Campaign Metrics',
+                        data: Object.values(metrics),
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
     </script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-    </style>
+    <!-- Optional Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
