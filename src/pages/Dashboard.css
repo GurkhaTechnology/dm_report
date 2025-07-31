@@ -1,0 +1,130 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: #f4f7fa;
+}
+
+/* Dashboard container */
+.dashboard-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.sidebar {
+  width: 100%;
+  max-width: 250px;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  z-index: 1;
+}
+
+.sidebar select,
+.sidebar input,
+.toggle-mode {
+  padding: 8px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 4px;
+}
+
+.toggle-mode {
+  background-color: #16a085;
+  color: #fff;
+  cursor: pointer;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 20px;
+  background-color: #ecf0f1;
+  transition: margin-left 0.3s ease;
+}
+
+.chart-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 20px;
+}
+
+.chart-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode */
+.dashboard-container.dark .main-content {
+  background-color: #1e272e;
+  color: #ffffff;
+}
+
+.dashboard-container.dark .chart-card {
+  background-color: #2f3640;
+  color: #ffffff;
+}
+
+.dashboard-container.dark .sidebar {
+  background-color: #1e272e;
+  color: #ffffff;
+}
+
+.dashboard-container.dark .toggle-mode {
+  background-color: #f39c12;
+  color: #000;
+}
+
+/* Mobile Styles */
+@media screen and (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 15px;
+  }
+
+  .chart-container {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    margin-bottom: 15px;
+  }
+}
+
+/* Smaller screen, like mobile portrait */
+@media screen and (max-width: 480px) {
+  .sidebar {
+    padding: 10px;
+  }
+
+  .toggle-mode {
+    font-size: 14px;
+    padding: 6px;
+  }
+}
